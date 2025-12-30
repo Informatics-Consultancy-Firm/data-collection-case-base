@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Collection Form - ICF Sierra Leone</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <div class="logo-container">
+                <div class="logo-box">
+                    <img src="NMCP.png" alt="NMCP Logo" class="logo-img">
+                </div>
+                <div class="logo-box">
+                    <img src="ICF-SL.jpg" alt="ICF-SL Logo" class="logo-img">
+                </div>
+            </div>
+
+            <div class="login-header">
+                <h1>Welcome</h1>
+                <p>Please login to access the data collection form</p>
+            </div>
+
+            <div class="login-error" id="loginError">Invalid username or password</div>
+
+            <form id="loginForm">
+                <div class="login-form-group">
+                    <label class="login-label">Username</label>
+                    <input type="text" class="login-input" id="username" required autocomplete="username">
+                </div>
+
+                <div class="login-form-group">
+                    <label class="login-label">Password</label>
+                    <input type="password" class="login-input" id="password" required autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- ICF Header -->
+        <header class="icf-header">
+            <div class="header-container">
+                <div class="header-logos">
+                    <img src="NMCP.png" alt="NMCP" class="header-logo">
+                    <img src="ICF-SL.jpg" alt="ICF-SL" class="header-logo">
+                </div>
+                <div class="header-title">
+                    <h1>Health Facility Data Collection System</h1>
+                    <p>National Malaria Control Programme | Informatics Consultancy Firm - Sierra Leone</p>
+                </div>
+                <div class="header-actions">
+                    <span id="currentUser">Welcome, Admin</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="main-nav">
+            <div class="nav-container">
+                <button class="nav-tab active" data-tab="form" onclick="switchTab('form')">
+                    📝 Data Entry
+                </button>
+                <button class="nav-tab" data-tab="dashboard" onclick="switchTab('dashboard')">
+                    📊 Dashboard
+                </button>
+                <button class="nav-tab" data-tab="data" onclick="switchTab('data')">
+                    📋 View Data
+                </button>
+                <button class="logout-btn" id="logoutBtn">🚪 Logout</button>
+            </div>
+        </nav>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-container">
+                <div class="status-item">
+                    <div class="status-indicator" id="statusIndicator"></div>
+                    <span class="status-text" id="statusText">Checking...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Pending:</span>
+                    <span class="pending-count" id="pendingCount">0</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">DHIS2:</span>
+                    <span class="dhis2-status" id="dhis2Status">Not Connected</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Data Entry Form -->
+        <div class="tab-content active" id="tab-form">
+            <div class="container">
+                <div class="form-card">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Section 1 of 9</div>
+
+                    <form id="dataForm">
+                        <!-- Section 1: Location & Time -->
+                        <div class="form-section active" data-section="1">
+                            <div class="section-header">
+                                <h2 class="section-title">📍 Location & Time Information</h2>
+                                <p class="section-description">Basic facility and reporting information</p>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Year <span class="required">*</span></label>
+                                    <input type="text" class="form-input" name="year" id="yearInput" value="2025" readonly>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Month <span class="required">*</span></label>
+                                    <select class="form-select" name="month" id="monthSelect" required>
+                                        <option value="">Select month...</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Region <span class="required">*</span></label>
+                                    <select class="form-select" name="region" id="regionSelect" required>
+                                        <option value="">Select region...</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">District <span class="required">*</span></label>
+                                    <select class="form-select" name="district" id="districtSelect" required disabled>
+                                        <option value="">Select region first...</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Chiefdom <span class="required">*</span></label>
+                                    <select class="form-select" name="chiefdom" id="chiefdomSelect" required disabled>
+                                        <option value="">Select district first...</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Health Facility <span class="required">*</span></label>
+                                    <select class="form-select" name="healthFacility" id="healthFacilitySelect" required disabled>
+                                        <option value="">Select chiefdom first...</option>
+                                    </select>
+                                    <input type="hidden" id="healthFacilityName" name="healthFacilityName">
+                                </div>
+                            </div>
+
+                            <div class="navigation-buttons">
+                                <button type="button" class="btn-nav btn-next" onclick="nextSection()">Next Section →</button>
+                            </div>
+                        </div>
+
+                        <!-- Form Type Selection -->
+                        <div class="form-section" data-section="0">
+                            <div class="section-header">
+                                <h2 class="section-title">⚕️ Select Form Type</h2>
+                                <p class="section-description">Choose the appropriate form for data entry</p>
+                            </div>
+
+                            <div class="form-type-container">
+                                <div class="form-type-header">
+                                    <h3>Choose Your Form Type</h3>
+                                    <p>Select one option below to continue</p>
+                                </div>
+
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="formType" value="under_five" id="underFiveRadio" required>
+                                        <span>UNDER FIVE REGISTER (0-59 months)</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="formType" value="general" id="generalRadio" required>
+                                        <span>GENERAL FORM (5+ years)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="navigation-buttons" style="margin-top: 30px;">
+                                <button type="button" class="btn-nav btn-back" onclick="previousSection()">← Back</button>
+                                <button type="button" class="btn-nav btn-next" onclick="nextSection()">Continue →</button>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic sections will be inserted here -->
+                        <div id="dynamicSections"></div>
+                    </form>
+                </div>
+
+                <!-- Action Buttons Panel -->
+                <div class="action-panel" id="actionPanel" style="display: none;">
+                    <h3>📤 Data Submission Options</h3>
+                    <div class="action-buttons">
+                        <button type="button" class="btn-action btn-sheets" onclick="submitToSheets()">
+                            <span class="btn-icon">📊</span>
+                            <span class="btn-text">Save to Google Sheets</span>
+                        </button>
+                        <button type="button" class="btn-action btn-dhis2" onclick="pushToDHIS2()">
+                            <span class="btn-icon">🏥</span>
+                            <span class="btn-text">Push to DHIS2</span>
+                        </button>
+                        <button type="button" class="btn-action btn-both" onclick="submitBoth()">
+                            <span class="btn-icon">🚀</span>
+                            <span class="btn-text">Submit to Both</span>
+                        </button>
+                    </div>
+                    <div class="email-notification">
+                        <label>
+                            <input type="checkbox" id="sendEmailNotification" checked>
+                            Send email notification on successful DHIS2 push
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Dashboard -->
+        <div class="tab-content" id="tab-dashboard">
+            <div class="dashboard-container">
+                <!-- Dashboard Filters -->
+                <div class="dashboard-filters">
+                    <h3>🔍 Filter Data</h3>
+                    <div class="filter-grid">
+                        <div class="filter-group">
+                            <label>Year</label>
+                            <select id="filterYear" onchange="applyFilters()">
+                                <option value="">All Years</option>
+                                <option value="2024">2024</option>
+                                <option value="2025" selected>2025</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Month</label>
+                            <select id="filterMonth" onchange="applyFilters()">
+                                <option value="">All Months</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Region</label>
+                            <select id="filterRegion" onchange="applyDashboardRegionFilter()">
+                                <option value="">All Regions</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>District</label>
+                            <select id="filterDistrict" onchange="applyDashboardDistrictFilter()">
+                                <option value="">All Districts</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Chiefdom</label>
+                            <select id="filterChiefdom" onchange="applyDashboardChiefdomFilter()">
+                                <option value="">All Chiefdoms</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Health Facility</label>
+                            <select id="filterFacility" onchange="applyFilters()">
+                                <option value="">All Facilities</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-actions">
+                        <button class="btn-filter" onclick="applyFilters()">🔄 Apply Filters</button>
+                        <button class="btn-filter btn-clear" onclick="clearFilters()">✖ Clear All</button>
+                        <button class="btn-filter btn-refresh" onclick="refreshDashboard()">🔃 Refresh Data</button>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <div class="card-icon">📝</div>
+                        <div class="card-content">
+                            <h4>Total Records</h4>
+                            <span class="card-value" id="totalRecords">0</span>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">🏥</div>
+                        <div class="card-content">
+                            <h4>Facilities Reported</h4>
+                            <span class="card-value" id="facilitiesReported">0</span>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">🦟</div>
+                        <div class="card-content">
+                            <h4>Malaria Cases</h4>
+                            <span class="card-value" id="malariaCases">0</span>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">✅</div>
+                        <div class="card-content">
+                            <h4>RDT Positive</h4>
+                            <span class="card-value" id="rdtPositive">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="charts-grid">
+                    <!-- Malaria by Region -->
+                    <div class="chart-card">
+                        <h4>🦟 Malaria Cases by Region</h4>
+                        <canvas id="malariaByRegionChart"></canvas>
+                    </div>
+
+                    <!-- RDT Results Pie -->
+                    <div class="chart-card">
+                        <h4>🔬 RDT Test Results</h4>
+                        <canvas id="rdtResultsChart"></canvas>
+                    </div>
+
+                    <!-- Monthly Trend -->
+                    <div class="chart-card">
+                        <h4>📈 Monthly Trend</h4>
+                        <canvas id="monthlyTrendChart"></canvas>
+                    </div>
+
+                    <!-- Treatment Distribution -->
+                    <div class="chart-card">
+                        <h4>💊 ACT Treatment Distribution</h4>
+                        <canvas id="treatmentChart"></canvas>
+                    </div>
+
+                    <!-- Age Group Distribution -->
+                    <div class="chart-card">
+                        <h4>👥 Cases by Age Group</h4>
+                        <canvas id="ageGroupChart"></canvas>
+                    </div>
+
+                    <!-- District Comparison -->
+                    <div class="chart-card">
+                        <h4>🏛️ Cases by District</h4>
+                        <canvas id="districtChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Variable Charts Section -->
+                <div class="variable-charts-section">
+                    <h3>📊 All Variables Analysis</h3>
+                    <div class="variable-selector">
+                        <label>Select Variable:</label>
+                        <select id="variableSelect" onchange="renderVariableChart()">
+                            <option value="">-- Select a variable --</option>
+                        </select>
+                    </div>
+                    <div class="chart-card full-width">
+                        <canvas id="variableChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: View Data -->
+        <div class="tab-content" id="tab-data">
+            <div class="data-container">
+                <div class="data-header">
+                    <h3>📋 Submitted Data</h3>
+                    <div class="data-actions">
+                        <button class="btn-data" onclick="loadDataFromSheets()">🔄 Refresh</button>
+                        <button class="btn-data" onclick="exportToCSV()">📥 Export CSV</button>
+                        <button class="btn-data" onclick="window.open(GOOGLE_SHEET_URL, '_blank')">📊 Open Sheet</button>
+                    </div>
+                </div>
+
+                <!-- Data Filters -->
+                <div class="data-filters">
+                    <input type="text" id="dataSearch" placeholder="🔍 Search records..." onkeyup="filterDataTable()">
+                    <select id="dataFormType" onchange="filterDataTable()">
+                        <option value="">All Form Types</option>
+                        <option value="under_five">Under Five</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+
+                <!-- Data Table -->
+                <div class="data-table-wrapper">
+                    <table class="data-table" id="dataTable">
+                        <thead>
+                            <tr id="dataTableHeader">
+                                <th>Date</th>
+                                <th>Facility</th>
+                                <th>Form Type</th>
+                                <th>Region</th>
+                                <th>District</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableBody">
+                            <tr>
+                                <td colspan="6" class="loading-data">Loading data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </div>
+
+        <!-- ICF Footer -->
+        <footer class="icf-footer">
+            <div class="footer-container">
+                <div class="footer-logos">
+                    <img src="NMCP.png" alt="NMCP" class="footer-logo">
+                    <img src="ICF-SL.jpg" alt="ICF-SL" class="footer-logo">
+                </div>
+                <div class="footer-info">
+                    <p><strong>National Malaria Control Programme</strong></p>
+                    <p>Informatics Consultancy Firm - Sierra Leone (ICF-SL)</p>
+                    <p>📧 info@icf-sl.org | 📞 +232 XX XXX XXX</p>
+                </div>
+                <div class="footer-copyright">
+                    <p>© 2025 ICF-SL. All rights reserved.</p>
+                    <p>Version 2.0 | DHIS2 Integrated</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="notification" id="notification">
+        <span class="notification-icon" id="notificationIcon">ℹ️</span>
+        <span class="notification-text" id="notificationText"></span>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p id="loadingText">Processing...</p>
+        </div>
+    </div>
+
+    <!-- DHIS2 Push Modal -->
+    <div class="modal" id="dhis2Modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🏥 DHIS2 Push Status</h3>
+                <button class="modal-close" onclick="closeModal('dhis2Modal')">&times;</button>
+            </div>
+            <div class="modal-body" id="dhis2ModalBody">
+                <!-- Status will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal" onclick="closeModal('dhis2Modal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Preview Modal -->
+    <div class="modal" id="emailModal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>📧 Email Notification Preview</h3>
+                <button class="modal-close" onclick="closeModal('emailModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="emailPreviewBody">
+                <!-- Email preview will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal btn-secondary" onclick="closeModal('emailModal')">Cancel</button>
+                <button class="btn-modal btn-primary" onclick="sendEmailNotification()">Send Email</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="dhis2.js"></script>
+    <script src="dashboard.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
